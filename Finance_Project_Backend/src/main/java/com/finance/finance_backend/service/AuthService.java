@@ -28,7 +28,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.VIEWER) 
+                .role(request.getRole() != null ? request.getRole() : Role.VIEWER) 
                 .active(true)
                 .build();
                 

@@ -1,4 +1,4 @@
-# Zorvyn Finance - Backend Assessment
+# Zorvyn Finance - Backend Application
 
 ## Overview
 This is the core Spring Boot backend for the Finance Data Processing and Access Control system. It provides secure, stateless API endpoints for financial data aggregation and user management using JWT-based authentication.
@@ -40,29 +40,31 @@ This documentation explicitly maps implementation choices directly to grading ex
 
 ### 8. Additional Thoughtfulness
 - **Stateless Authentication:** Stateless JWT session management allows infinite horizontal backend scaling.
-- **Method Security**: Leveraged `@PreAuthorize` natively over controller methods to guarantee true backend-level Access Control independent of any client.
+- **Cross-Origin Resourcing:** Configured Global **CORS** explicitly so the application natively integrates with disjointed Frontend architectures without browser blockage.
 
 ## 🏗️ Architecture Flow Diagram
+User Submits React Form
+        ↓
+Axios attaches JWT to Header
+        ↓
+JwtAuthenticationFilter intercepts
+        ↓
+Token Verified & Claims Parsed
+        ↓
+Controller method invoked
+        ↓
+Service layer maps DTO to Entity
+        ↓
+FinancialRecordRepository.save(record)
+        ↓
+Hibernate intercepts
+        ↓
+@PrePersist method runs (adds auto-timestamps)
+        ↓
+INSERT query executed securely
+        ↓
+Data stored cleanly in MySQL DB
 
-```mermaid
-graph TD
-    Client[Frontend / Postman] -->|HTTP Request| SecurityFilter[JwtAuthenticationFilter]
-    
-    SecurityFilter -->|No Token / Invalid| ExceptionHandler[Global Exception Handler]
-    SecurityFilter -->|Valid Bearer Token| Controller[REST Controller]
-    
-    Controller -->|Delegates Logic| Service[Business Service Layer]
-    Service -->|Requests Data| Repository[Spring Data JPA Repository]
-    
-    Repository -->|Hibernate @PrePersist / JPQL| DB[(MySQL Database)]
-    
-    DB -->|Result Set| Repository
-    Repository -->|Entity to DTO Mapping| Service
-    Service -->|Returns Payload| Controller
-    Controller -->|200 OK JSON| Client
-    
-    ExceptionHandler -->|Translates Error| ErrorResponse[HTTP 4xx JSON]
-```
 
 ## 🚀 Setup & Run
 1. Configure MySQL username and password variables within `application.properties`.
