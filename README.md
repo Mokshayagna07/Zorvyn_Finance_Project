@@ -44,6 +44,19 @@ This project uses Java and Spring Boot. To keep things clean, the code is split 
 
 ---
 
+## 🗺️ Project Architecture Flowchart
+
+```mermaid
+graph TD
+    Client[Postman / Browser] -->|Requests| Bouncer[Security: JWT Token Check]
+    Bouncer -->|Authorized| Reception[Controller: Receives Request]
+    Reception -->|Passes Data| Brain[Service: Business Logic & Math]
+    Brain -->|Save/Load Data| Cabinet[Repository: Database Commands]
+    Cabinet -->|SQL Queries| DB[(MySQL Database)]
+```
+
+---
+
 ## 🚀 How to Run the Project on Your Computer
 
 1. **Set up the Database:** 
