@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -18,25 +19,25 @@ public class FinancialRecordController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<FinancialRecordDto> createRecord(@RequestBody FinancialRecordDto dto) {
+    public ResponseEntity<FinancialRecordDto> createRecord(@Valid @RequestBody FinancialRecordDto dto) {
         return ResponseEntity.ok(service.createRecord(dto));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST', 'VIEWER')")
     public ResponseEntity<List<FinancialRecordDto>> getAllRecords() {
         return ResponseEntity.ok(service.getAllRecords());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST', 'VIEWER')")
     public ResponseEntity<FinancialRecordDto> getRecordById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getRecordById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<FinancialRecordDto> updateRecord(@PathVariable Long id, @RequestBody FinancialRecordDto dto) {
+    public ResponseEntity<FinancialRecordDto> updateRecord(@PathVariable Long id, @Valid @RequestBody FinancialRecordDto dto) {
         return ResponseEntity.ok(service.updateRecord(id, dto));
     }
 
