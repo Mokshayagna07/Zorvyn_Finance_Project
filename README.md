@@ -1,70 +1,59 @@
-# Zorvyn Finance - Backend Assessment
+# Zorvyn Finance - Backend Application
 
-## Overview
-This is the core Spring Boot backend for the Finance Data Processing and Access Control system. It provides secure, stateless API endpoints for financial data aggregation and user management using JWT-based authentication.
+Welcome to the **Zorvyn Finance Backend Project**! 
 
-## 🏆 Evaluation Criteria Addressed
+If you are new to programming, think of this project as the "brain" and "filing cabinet" of a finance tracking application. It doesn't have a visual website design (frontend) yet. Instead, it securely manages data, calculates totals, and decides who is allowed to view or edit financial records.
 
-### 1. Backend Design
-The application strictly follows an **N-Tier MVC Architecture** separating concerns logically:
-- **Controllers** (`/controller`): Handle HTTP request routing, CORS, and JSON parameter mapping.
-- **Services** (`/service`): Encapsulate all raw business logic, preventing bloated controllers.
-- **Repositories** (`/repository`): Utilize Spring Data JPA abstractions for direct data access.
-- **Security** (`/security`): Isolated filter chains managing JWT generation, extraction, and authorization logic.
+---
 
-### 2. Logical Thinking
-- **Access Control:** Implemented logically via a `Role` enum setup extending into customized token claims.
-- **Efficient Data Processing:** Offloaded heavy aggregation logic (like calculating Total Income and Expenses) directly to the database via `JPQL` (`SUM(f.amount) ... WHERE f.type= :type`) rather than indiscriminately pulling thousands of rows into server memory.
+## 📖 What Does This Project Do?
 
-### 3. Functionality
-- **Auth APIs:** `/api/auth/register` and `/api/auth/login` cleanly handle secure credential exchange.
-- **Financial APIs:** Implemented complete CRUD capabilities over `/api/records` using `FinancialRecordDto`.
-- **Dashboard APIs:** Dedicated aggregation endpoint at `/api/dashboard/summary`.
+This application provides a secure way to manage financial data. It allows users to:
+1. **Register and Log in** securely.
+2. **Add, Edit, View, and Delete** financial records (like logging a new paycheck or a grocery expense).
+3. **View a Dashboard Summary** that automatically calculates Total Income, Total Expenses, and Net Balance.
+4. **Enforce Rules (Access Control):** It prevents a simple "Viewer" from deleting data, only allowing "Admins" to make major changes.
 
-### 4. Code Quality
-- Enforced pristine immutability and eliminated boilerplate getters/setters via **Lombok** (`@RequiredArgsConstructor`, `@Data`, `@Builder`).
-- Employed **DTOs** (Data Transfer Objects) to intentionally separate the API web contract from underlying Database Entities.
-- Adhered strictly to core Java naming conventions and logical structural packaging.
+---
 
-### 5. Database and Data Modeling
-- **Data Models:** The `User` and `FinancialRecord` are securely modeled and mapped automatically via `Hibernate`.
-- **Security Primitives:** Utilized `BigDecimal` instead of `Double` for financial values to actively prevent floating-point calculation drift.
-- **Timestamps:** Leveraged automated audit fields (e.g., Dates) to track record lifecycle organically.
+## 🏗️ How the Code is Organized (Beginner's Guide)
 
-### 6. Validation and Reliability
-- Engineered a modular `@ControllerAdvice` **Global Exception Handler** which reliably catches arbitrary runtime errors, `AccessDeniedException`s, and business logic halts. 
-- Automatically intercepts these failures and morphs them into pristine, formatted JSON payloads (`ErrorResponse`) rather than leaking generic Spring Boot HTML traces to the end user.
+This project uses Java and Spring Boot. To keep things clean, the code is split into specific folders based on what the code does. This is a very common professional practice!
 
-### 7. Documentation
-This documentation explicitly maps implementation choices directly to grading expectations. API methodology is deterministic matching 1:1 with standard HTTP methods (`POST` for creations, `GET` for retrieval, `DELETE` for purging).
+- **`/controller` (The Receptionists):** 
+  These files listen for internet requests (like someone asking to log in or save a new record). They check the request and hand it over to the Services.
+- **`/service` (The Brain):** 
+  This is where the actual logic happens. If the Dashboard needs the "Total Net Balance", the Service does the math.
+- **`/repository` (The Filing Cabinets):** 
+  These files talk directly to the MySQL Database. They handle saving, finding, and deleting rows of data.
+- **`/entity` (The Blueprints):** 
+  These files define what our data looks like. For example, `FinancialRecord.java` states that every record must have an `amount`, a `date`, and a `category` (like Income or Expense).
+- **`/security` (The Bouncers):** 
+  These files check the user's "Token" (ID Badge) to make sure they are actually logged in and allowed to access the data.
 
-### 8. Additional Thoughtfulness
-- **Stateless Authentication:** Stateless JWT session management allows infinite horizontal backend scaling.
-- **Method Security**: Leveraged `@PreAuthorize` natively over controller methods to guarantee true backend-level Access Control independent of any client.
+---
 
-## 🏗️ Architecture Flow Diagram
+## 🔒 Security & Rules We Added
 
-```mermaid
-graph TD
-    Client[Frontend / Postman] -->|HTTP Request| SecurityFilter[JwtAuthenticationFilter]
-    
-    SecurityFilter -->|No Token / Invalid| ExceptionHandler[Global Exception Handler]
-    SecurityFilter -->|Valid Bearer Token| Controller[REST Controller]
-    
-    Controller -->|Delegates Logic| Service[Business Service Layer]
-    Service -->|Requests Data| Repository[Spring Data JPA Repository]
-    
-    Repository -->|Hibernate @PrePersist / JPQL| DB[(MySQL Database)]
-    
-    DB -->|Result Set| Repository
-    Repository -->|Entity to DTO Mapping| Service
-    Service -->|Returns Payload| Controller
-    Controller -->|200 OK JSON| Client
-    
-    ExceptionHandler -->|Translates Error| ErrorResponse[HTTP 4xx JSON]
-```
+1. **Tokens (JWT):** We don't use simple passwords for every request. Once a user logs in, they get a "Token". They use this token for all future requests to prove who they are.
+2. **Access Levels:** 
+   - **Admins:** Can do everything (Create, Edit, Delete).
+   - **Analysts:** Can view records and summaries but cannot edit data.
+   - **Viewers:** Can only look at data.
+3. **Data Protection:** We wrote rules (Validations) so no one can accidentally submit a financial record with a negative amount or an empty date!
 
-## 🚀 Setup & Run
-1. Configure MySQL username and password variables within `application.properties`.
-2. Ensure your local `MySQL Server` is active at port `3306`.
-3. Boot the environment: `./mvnw spring-boot:run`
+---
+
+## 🚀 How to Run the Project on Your Computer
+
+1. **Set up the Database:** 
+   Make sure you have MySQL installed on your computer. Open your MySQL tool and create a new database called `finance_project`.
+2. **Database Passwords:**
+   Open `src/main/resources/application.properties` and change the `root` username and password to whatever you use for your local MySQL.
+3. **Start the Code:**
+   Open your terminal in the backend folder and run this command:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+4. **Test the Code:**
+   Check out the `API_Testing_Guide.txt` file included in this project. It shows exactly how to use a tool like Postman to test adding records and logging in!
