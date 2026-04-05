@@ -2,7 +2,7 @@
 
 Welcome to the **Zorvyn Finance Backend Project**! 
 
-If you are new to programming, think of this project as the "brain" and "filing cabinet" of a finance tracking application. It doesn't have a visual website design (frontend) yet. Instead, it securely manages data, calculates totals, and decides who is allowed to view or edit financial records.
+This project acts as the secure foundational core of a finance tracking application, utilizing a RESTful N-Tier Architecture to manage user data, execute complex aggregation logic, and enforce explicit method-level authorization protocols.
 
 ---
 
@@ -16,20 +16,20 @@ This application provides a secure way to manage financial data. It allows users
 
 ---
 
-## 🏗️ How the Code is Organized (Beginner's Guide)
+## 🏗️ System Architecture & Layered Design
 
-This project uses Java and Spring Boot. To keep things clean, the code is split into specific folders based on what the code does. This is a very common professional practice!
+This project uses Java and Spring Boot. To ensure maximum code maintainability and separation of concerns, the application strictly adheres to the N-Tier layered architecture pattern:
 
-- **`/controller` (The Receptionists):** 
-  These files listen for internet requests (like someone asking to log in or save a new record). They check the request and hand it over to the Services.
-- **`/service` (The Brain):** 
-  This is where the actual logic happens. If the Dashboard needs the "Total Net Balance", the Service does the math.
-- **`/repository` (The Filing Cabinets):** 
-  These files talk directly to the MySQL Database. They handle saving, finding, and deleting rows of data.
-- **`/entity` (The Blueprints):** 
-  These files define what our data looks like. For example, `FinancialRecord.java` states that every record must have an `amount`, a `date`, and a `category` (like Income or Expense).
-- **`/security` (The Bouncers):** 
-  These files check the user's "Token" (ID Badge) to make sure they are actually logged in and allowed to access the data.
+- **`/controller` (API Endpoints):** 
+  These classes intercept incoming HTTP REST requests, validate structural payloads, and route logic down to the internal Services.
+- **`/service` (Business Logic Layer):** 
+  This layer handles all core business logic and computational requirements, abstracting complexity away from the controllers.
+- **`/repository` (Data Access Layer):** 
+  Utilizes Spring Data JPA paradigms to interface directly with the MySQL relational database for persistence and retrieval.
+- **`/entity` (Domain Models):** 
+  Strictly typed JPA blueprints representing database schemas governing data integrity (e.g., `FinancialRecord.java`).
+- **`/security` (Authorization Models):** 
+  Incorporates a custom stateless `JwtAuthenticationFilter` configuration to parse Bearer tokens and enforce explicit API security.
 
 ---
 
