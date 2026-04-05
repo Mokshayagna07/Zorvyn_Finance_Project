@@ -1,104 +1,110 @@
 =================================================
- ZORVYN FINANCE API - TESTING GUIDE (POSTMAN)
+ ZORVYN FINANCE API - STEP-BY-STEP TESTING GUIDE
 =================================================
-Base URL: http://localhost:8080
 
-IMPORTANT: 
-For all endpoints below (except Auth), you must include the JWT Token in the HTTP Headers.
-Header Key:   Authorization
-Header Value: Bearer <your_token_here>
-
+This guide will walk you through strictly testing every single endpoint in Postman from start to finish.
 
 -------------------------------------------------
- 1. AUTHENTICATION (No Token Required)
+ STEP 1: CREATE YOUR ADMIN ACCOUNT
 -------------------------------------------------
-
-[REGISTER AN ACCOUNT]
-Method: POST
-URL:    http://localhost:8080/api/auth/register
-Body (RAW JSON):
+[CREATE ADMIN USER]
+• Method: POST
+• URL: http://localhost:8080/api/auth/register
+• Token Needed: NO
+• Body (Raw -> JSON):
 {
-    "username": "adminUser",
-    "email": "admin@test.com",
+    "username": "AdminBoss",
+    "email": "admin@zorvyn.com",
     "password": "password123",
-    "role": "ADMIN"          // Can be "ADMIN", "ANALYST", or "VIEWER"
+    "role": "ADMIN"          
 }
+🟢 What to do next: Copy the long "token" string from the response! You will need this token for actions that only an ADMIN can do.
 
-
-[LOGIN TO ACCOUNT]
-Method: POST
-URL:    http://localhost:8080/api/auth/login
-Body (RAW JSON):
+-------------------------------------------------
+ STEP 2: CREATE A VIEWER ACCOUNT (For Testing)
+-------------------------------------------------
+[CREATE VIEWER USER]
+• Method: POST
+• URL: http://localhost:8080/api/auth/register
+• Token Needed: NO
+• Body (Raw -> JSON):
 {
-    "email": "admin@test.com",
-    "password": "password123"
+    "username": "ViewerGuest",
+    "email": "viewer@zorvyn.com",
+    "password": "password123",
+    "role": "VIEWER"          
 }
-Response: Copy the "token" value! You will need it for the next requests.
-
-
--------------------------------------------------
- 2. DASHBOARD (All Roles Allowed)
--------------------------------------------------
-
-[GET DASHBOARD SUMMARY]
-Method: GET
-URL:    http://localhost:8080/api/dashboard/summary
-Header: Authorization: Bearer <token>
-Response: Returns Total Income, Total Expense, and Net Balance.
-
+🟢 What to do next: Copy this "token" and save it somewhere else as your Viewer Token.
 
 -------------------------------------------------
- 3. FINANCIAL RECORDS (Strict Role Verification)
+ STEP 3: CREATE A FINANCIAL RECORD (Admin Only!)
 -------------------------------------------------
-
-[CREATE NEW RECORD] (Action: ADMIN Only)
-Method: POST
-URL:    http://localhost:8080/api/records
-Header: Authorization: Bearer <token>
-Body (RAW JSON):
+[ADD RECORD]
+• Method: POST
+• URL: http://localhost:8080/api/records
+• Token Needed: YES 👉 Use your ADMIN token from Step 1.
+   (Go To Authorization Tab -> Select "Bearer Token" -> Paste Admin Token)
+• Body (Raw -> JSON):
 {
-    "amount": 2500.50,
-    "type": "INCOME",        // Must be "INCOME" or "EXPENSE"
+    "amount": 5000.00,
+    "type": "INCOME",
     "category": "Salary",
-    "date": "2026-04-04",
-    "notes": "April Paycheck"
+    "date": "2026-04-05",
+    "notes": "First paycheck"
 }
+*Note: If you omit the amount or specify a negative amount, you will get a 400 Bad Request error (Validation check!)*
+🟢 What to do next: Look at the response and copy the "id" of the record you just created (e.g., id: 1).
 
+-------------------------------------------------
+ STEP 4: VIEW ALL RECORDS (Anyone can view)
+-------------------------------------------------
+[GET RECORDS]
+• Method: GET
+• URL: http://localhost:8080/api/records
+• Token Needed: YES 👉 You can use EITHER the Admin or Viewer Token here.
+• Body: NONE (Leave it empty)
 
-[GET ALL RECORDS] (Action: ADMIN or ANALYST Only)
-Method: GET
-URL:    http://localhost:8080/api/records
-Header: Authorization: Bearer <token>
+-------------------------------------------------
+ STEP 5: VIEW A SINGLE RECORD
+-------------------------------------------------
+[GET SINGLE RECORD BY ID]
+• Method: GET
+• URL: http://localhost:8080/api/records/1   <-- Change '1' to your actual record ID
+• Token Needed: YES 👉 You can use EITHER the Admin or Viewer Token here.
+• Body: NONE (Leave it empty)
 
-
-[GET A SINGLE RECORD BY ID] (Action: ADMIN or ANALYST Only)
-Method: GET
-URL:    http://localhost:8080/api/records/1
-Header: Authorization: Bearer <token>
-
-
-[UPDATE RECORD BY ID] (Action: ADMIN Only)
-Method: PUT
-URL:    http://localhost:8080/api/records/1
-Header: Authorization: Bearer <token>
-Body (RAW JSON):
+-------------------------------------------------
+ STEP 6: UPDATE A RECORD (Admin Only!)
+-------------------------------------------------
+[UPDATE RECORD]
+• Method: PUT
+• URL: http://localhost:8080/api/records/1   <-- Change '1' to your actual record ID
+• Token Needed: YES 👉 MUST use ADMIN token. (If you use Viewer, you get 403 Forbidden).
+• Body (Raw -> JSON):
 {
-    "amount": 3000.00,
+    "amount": 6000.00,
     "type": "INCOME",
     "category": "Salary Bonus",
     "date": "2026-04-05",
-    "notes": "Updated to include bonus"
+    "notes": "Updated salary with a bonus!"
 }
 
-
-[DELETE RECORD BY ID] (Action: ADMIN Only)
-Method: DELETE
-URL:    http://localhost:8080/api/records/1
-Header: Authorization: Bearer <token>
-
+-------------------------------------------------
+ STEP 7: VIEW THE DASHBOARD SUMMARY
+-------------------------------------------------
+[GET DASHBOARD]
+• Method: GET
+• URL: http://localhost:8080/api/dashboard/summary
+• Token Needed: YES 👉 You can use EITHER the Admin or Viewer token.
+• Body: NONE
+🟢 What happens: It will calculate your total income vs expenses and give you the Net Balance perfectly!
 
 -------------------------------------------------
- HOW TO TEST VALIDATIONS & ACCESS CONTROL
+ STEP 8: DELETE A RECORD (Admin Only!)
 -------------------------------------------------
-1. Try sending the [CREATE NEW RECORD] JSON without an "amount". You will see a 400 Bad Request JSON generated by the GlobalExceptionHandler.
-2. Login as a VIEWER and try hitting [GET ALL RECORDS]. You will see a 403 Forbidden AccessDenied error because of your `@PreAuthorize` Backend validations!
+[DELETE RECORD]
+• Method: DELETE
+• URL: http://localhost:8080/api/records/1   <-- Change '1' to your actual record ID
+• Token Needed: YES 👉 MUST use ADMIN token.
+• Body: NONE
+🟢 What happens: You will get an empty success response showing the record has been permanently deleted from your MySQL database. If you try to do this with your Viewer token, you will receive a 403 Forbidden error!
