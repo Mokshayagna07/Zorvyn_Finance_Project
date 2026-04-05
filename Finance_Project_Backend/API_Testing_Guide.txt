@@ -18,6 +18,11 @@ This guide will walk you through strictly testing every single endpoint in Postm
     "password": "password123",
     "role": "ADMIN"          
 }
+
+
+token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB6b3J2eW4uY29tIiwiaWF0IjoxNzc1MzY0NzY2LCJleHAiOjE3NzU0NTExNjZ9._jWnMMZoiV4RUPTGr_UiVM5Dhqy_LimrBfqz-5CvDXA
+
+
 🟢 What to do next: Copy the long "token" string from the response! You will need this token for actions that only an ADMIN can do.
 
 -------------------------------------------------
@@ -34,6 +39,10 @@ This guide will walk you through strictly testing every single endpoint in Postm
     "password": "password123",
     "role": "VIEWER"          
 }
+
+token  eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWV3ZXJAem9ydnluLmNvbSIsImlhdCI6MTc3NTM2NDg0OSwiZXhwIjoxNzc1NDUxMjQ5fQ.5Hq-fMB7xA61ot6lHGdtC-3NjcKoWtOmwD_SgdOrMrI
+
+
 🟢 What to do next: Copy this "token" and save it somewhere else as your Viewer Token.
 
 -------------------------------------------------
@@ -108,3 +117,17 @@ This guide will walk you through strictly testing every single endpoint in Postm
 • Token Needed: YES 👉 MUST use ADMIN token.
 • Body: NONE
 🟢 What happens: You will get an empty success response showing the record has been permanently deleted from your MySQL database. If you try to do this with your Viewer token, you will receive a 403 Forbidden error!
+
+=================================================
+🚨 COMMON POSTMAN ERRORS (403 Forbidden)
+=================================================
+If you are still getting a "403 Forbidden" error even after adding your token, check these 3 easy mistakes:
+
+1. DID YOU TYPE THE WORD "Bearer"?
+   In the Authorization tab under "Bearer Token", do NOT type the word "Bearer". Postman writes it invisibly. If you type it, Postman sends "Bearer Bearer", which breaks your API token! Just paste the raw string (eyJhb...).
+
+2. DID YOU COPY QUOTATION MARKS?
+   When copying the token from the login response, DO NOT copy the quotation marks (" "). Only copy what is inside them. Quotation marks will corrupt your token!
+
+3. DID YOU ACTUALLY REGISTER AN "ADMIN"?
+   If you made a typo like "role": "Admin" (lowercase), your account immediately defaulted to VIEWER to protect your database. Viewer accounts cannot create or delete records. Create a new account with exactly "role": "ADMIN" (all caps).
