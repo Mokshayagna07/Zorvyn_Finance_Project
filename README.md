@@ -69,4 +69,4 @@ graph TD
    ./mvnw spring-boot:run
    ```
 4. **Test the Code:**
-   Check out the `API_Testing_Guide.txt` file included in this project. It shows exactly how to use a tool like Postman to test adding records and logging in!
+   Check out the `API_Documentation.md` file included in this project. It provides a formal breakdown of the endpoints, payload structures, and security logic so you can correctly interact with the API!
